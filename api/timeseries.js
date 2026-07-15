@@ -32,10 +32,18 @@ export default async function handler(req, res) {
   try {
     const upstream = await fetch(url);
     const data = await upstream.json();
-    // Cache at the edge for 5 minutes to conserve the free-tier request budget.
-    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
+    const ok = data && data.values && data.status !== 'error';
+    if (ok) {
+      // 4H candles change slowly — cache successful responses at the edge for 15 min
+      // so page reloads / multiple devices don't spend Twelve Data credits.
+      res.setHeader('Cache-Control', 's-maxage=900, stale-while-revalidate=3600');
+    } else {
+      // Never cache rate-limit / error responses, or they'd persist past the reset.
+      res.setHeader('Cache-Control', 'no-store');
+    }
     res.status(200).json(data);
   } catch (e) {
+    res.setHeader('Cache-Control', 'no-store');
     res.status(502).json({ status: 'error', message: 'Upstream fetch failed' });
   }
 }
