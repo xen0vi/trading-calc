@@ -1,7 +1,7 @@
 // Vercel serverless function — proxies Twelve Data so the API key stays server-side.
 // Set the key in your Vercel project: Settings → Environment Variables → TWELVEDATA_KEY
 
-const ALLOWED_SYMBOLS = new Set(['SLV', 'XAU/USD', 'USO', 'BTC/USD']);
+const ALLOWED_SYMBOLS = new Set(['SLV', 'XAU/USD', 'USO', 'BTC/USD', 'ETH/USD', 'SOL/USD']);
 const ALLOWED_INTERVALS = new Set(['1h', '2h', '4h', '1day']);
 
 export default async function handler(req, res) {
